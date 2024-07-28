@@ -11,9 +11,13 @@ grey = 112, 112, 112
 screen = pygame.display.set_mode(size)
 screen_rect = screen.get_rect()
 
-def drawonscreen(screen, tank):
+def drawonscreen(screen, tank, data):
     screen.fill(grey)
     screen.blit(tank.image, tank.rect)
+    if data != None:
+        for d in data:
+                if data[d] != []:
+                    screen.blit(tank.image, (data[d][0], data[d][1]))
     pygame.display.update()
 
 def main():
@@ -25,7 +29,7 @@ def main():
 
     run_game =  True
     n = Network()
-    n.connect()
+    current_id = n.connect("anon")
     while run_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -46,14 +50,18 @@ def main():
                 tank.move(turn_right=True)
 
         # Send tank turn and position to server
-        #data = {0: [], 1: [], 2: [], 3: []}
-        n.send_data([(tank.rect.x, tank.rect.y)])
+        data = {0: [], 1: [], 2: [], 3: []}
+        data[current_id] = [tank.rect.x, tank.rect.y]
+        n.send_data(data)
         # Receive their positions and draw it
         data = n.receive_data()
+        print("id: ", current_id)
+        print(data)
+        print("\n")
 
         clock.tick(100)
 
-        drawonscreen(screen, tank)
+        drawonscreen(screen, tank, data)
         #pygame.display.flip()
 
 if __name__ == "__main__":

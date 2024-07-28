@@ -6,11 +6,15 @@ class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server = "127.0.0.1"
-        self.port = 12345
+        self.port = 16666
         self.addr = (self.server, self.port)
 
-    def connect(self):
+    def connect(self, name):
+        """return id of the client that connected"""
         self.client.connect(self.addr)
+        self.client.send(str.encode(name))
+        val = self.client.recv(8)
+        return int(val.decode())
 
     def send_data(self, data):
         try:

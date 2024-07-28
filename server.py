@@ -3,7 +3,7 @@ import threading
 import pickle
 
 server = "127.0.0.1"
-port = 12345
+port = 16666
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -16,12 +16,16 @@ s.listen(4) # 4 tanks can be connected
 print(f"[SERVER STARTED] Waiting for a connection on {server}:{port}...")
 
 clients = []
-def handle_client(conn, addr):
+id = 0
+def handle_client(conn, addr, id):
+
     print(f"New connection: {addr}")
+    name = conn.recv(16).decode("utf-8")
+    print(f"[LOG] {name} connected to the server.")
+    conn.send(str.encode(str(id)))
     while True:
         try:
             data = conn.recv(4096)
-            print("received: ", pickle.loads(data))
             if not data:
                 break
             for client in clients:
@@ -32,13 +36,10 @@ def handle_client(conn, addr):
             conn.close()
             break
 
-def main():
-    while True:
-        conn, addr = s.accept()
-        clients.append(conn)
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
-        thread.start()
-        print(f"Active connections: {threading.active_count() - 1}")
-
-if __name__ == "__main__":
-    main()
+while True:
+    conn, addr = s.accept()
+    clients.append(conn)
+    thread = threading.Thread(target=handle_client, args=(conn, addr, id))
+    thread.start()
+    print(f"Active connections: {threading.active_count() - 1}")
+    id += 1
