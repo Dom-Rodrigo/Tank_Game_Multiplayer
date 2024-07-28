@@ -11,20 +11,32 @@ grey = 112, 112, 112
 screen = pygame.display.set_mode(size)
 screen_rect = screen.get_rect()
 
+tank_image = pygame.image.load("tank.png").convert_alpha()
+tank_image_right  = pygame.transform.rotate(tank_image, -90)
+tank_image_left = pygame.transform.rotate(tank_image, -270)
+tank_image_down =  pygame.transform.rotate(tank_image, -180)
+
 def drawonscreen(screen, tank, data):
     screen.fill(grey)
     screen.blit(tank.image, tank.rect)
     if data != None:
         for d in data:
                 if data[d] != []:
-                    screen.blit(tank.image, (data[d][0], data[d][1]))
+                    if data[d][2] in [0, 4, -4]: #Tank is poiting to the top
+                        screen.blit(tank_image, (data[d][0], data[d][1]))
+                    if data[d][2] in [-2, 2]: #Tank is pointing down
+                        screen.blit(tank_image_down, (data[d][0], data[d][1]))
+                    if data[d][2] in [-1, 3]: #Tank is poiting to the right
+                        screen.blit(tank_image_right, (data[d][0], data[d][1]))
+                    if data[d][2] in [1, -3]: #Tank is poiting to the left
+                        screen.blit(tank_image_left, (data[d][0], data[d][1]))
     pygame.display.update()
 
 
 data = {0: [], 1: [], 2: [], 3: []}
+#[x, y, turn]
 def main():
     global data
-    tank_image = pygame.image.load("tank.png").convert_alpha()
     tank = Tank(image=tank_image, x=0, y=0, speed=3, endurance=60)
 
     # tanks = pygame.sprite.Group()
@@ -53,7 +65,7 @@ def main():
                 tank.move(turn_right=True)
 
         # Send tank turn and position to server
-        data[current_id] = [tank.rect.x, tank.rect.y]
+        data[current_id] = [tank.rect.x, tank.rect.y, tank.turn]
         n.send_data(data)
         # Receive their positions and draw it
         data = n.receive_data()

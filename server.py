@@ -3,7 +3,7 @@ import threading
 import pickle
 
 server = "127.0.0.1"
-port = 12000
+port = 12200
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
