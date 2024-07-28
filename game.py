@@ -1,5 +1,7 @@
 import sys, pygame
 from tank import Tank
+from client import Network
+import pickle
 
 
 size = width, height = 900, 700
@@ -22,6 +24,8 @@ def main():
     # tanks.add(tank)
 
     run_game =  True
+    n = Network()
+    n.connect()
     while run_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -40,6 +44,12 @@ def main():
                 tank.move(turn_left=True)
             if keys[pygame.K_RIGHT]:
                 tank.move(turn_right=True)
+
+        # Send tank turn and position to server
+        #data = {0: [], 1: [], 2: [], 3: []}
+        n.send_data([(tank.rect.x, tank.rect.y)])
+        # Receive their positions and draw it
+        data = n.receive_data()
 
         clock.tick(100)
 
