@@ -20,7 +20,10 @@ def drawonscreen(screen, tank, data):
                     screen.blit(tank.image, (data[d][0], data[d][1]))
     pygame.display.update()
 
+
+data = {0: [], 1: [], 2: [], 3: []}
 def main():
+    global data
     tank_image = pygame.image.load("tank.png").convert_alpha()
     tank = Tank(image=tank_image, x=0, y=0, speed=3, endurance=60)
 
@@ -50,7 +53,6 @@ def main():
                 tank.move(turn_right=True)
 
         # Send tank turn and position to server
-        data = {0: [], 1: [], 2: [], 3: []}
         data[current_id] = [tank.rect.x, tank.rect.y]
         n.send_data(data)
         # Receive their positions and draw it
@@ -62,7 +64,7 @@ def main():
         clock.tick(100)
 
         drawonscreen(screen, tank, data)
-        #pygame.display.flip()
+        pygame.display.flip()
 
 if __name__ == "__main__":
     clock = pygame.time.Clock()
