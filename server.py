@@ -3,7 +3,7 @@ import threading
 import pickle
 
 server = "127.0.0.1"
-port = 12200
+port = 30479
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -12,7 +12,7 @@ try:
 except socket.error as e:
     str(e)
 
-s.listen(4) # 4 tanks can be connected
+s.listen(40) # 40 tanks can be connected
 print(f"[SERVER STARTED] Waiting for a connection on {server}:{port}...")
 
 clients = []
