@@ -74,7 +74,7 @@ def main():
                 tank.move(turn_right=True)
 
 
-        bullets.update()
+        bullets.update(width, height)
 
         # Send tank turn and position to server
         data[current_id] = [tank.rect.x, tank.rect.y, tank.turn]
