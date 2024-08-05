@@ -87,6 +87,25 @@ def main():
         n.send_data(data)
         # Receive their positions and draw it
         data = n.receive_data()
+
+        # CHECK FOR COLLISIONS
+        enemies_bullets = []
+
+        for id in data:
+            if data[id] != []:
+                if id != current_id:
+                    if data[id][3] != None:
+                        for i in range(0, len(data[id][3])):
+                            enemies_bullets.append(pygame.Rect(data[id][3][i][0], data[id][3][i][1], 8, 8)) #(8, 8) is b_img size
+
+        a = tank.rect.collidelist(enemies_bullets)
+        if a != -1: # A coliision happended
+            tank.endurance -= 1
+            print(f"Tank {current_id} endurance:  {tank.endurance}")
+            if tank.endurance == 0:
+                print("TANK DESTROYED")
+                break
+
         print("id: ", current_id)
         print(data)
         print("\n")
