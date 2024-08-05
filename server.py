@@ -3,7 +3,7 @@ import threading
 import pickle
 
 server = "127.0.0.1"
-port = 30479
+port = 39870
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -27,7 +27,8 @@ def handle_client(conn, addr, id):
         try:
             data = conn.recv(4096)
             if not data:
-                break
+                clients.remove(conn)
+                conn.close()
             for client in clients:
                 if client != conn:
                     client.send(data)

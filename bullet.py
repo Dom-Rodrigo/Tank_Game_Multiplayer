@@ -8,7 +8,7 @@ class Bullet(pygame.sprite.Sprite):
         self.image = image
         self.rect = image.get_rect()
         self.turn = tank.turn
-        self.speed = tank.speed * 5
+        self.speed = tank.speed * 3
         if self.turn in [0, 4, -4]: #Tank is poiting to the top
             self.rect.center = (tank.rect.x+38, tank.rect.y-20)
         if self.turn in [-2, 2]: #Tank is pointing down

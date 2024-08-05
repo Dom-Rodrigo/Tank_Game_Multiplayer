@@ -33,6 +33,9 @@ def drawonscreen(screen, tank, data, bullets):
                         screen.blit(tank_image_right, (data[d][0], data[d][1]))
                     if data[d][2] in [1, -3]: #Tank is poiting to the left
                         screen.blit(tank_image_left, (data[d][0], data[d][1]))
+                    if data[d][3] != None:
+                        for b in data[d][3]:
+                            screen.blit(bullet_image, (b[0], b[1]))
     bullets.draw(screen)
     pygame.display.update()
 
@@ -75,9 +78,12 @@ def main():
 
 
         bullets.update(width, height)
+        bullets_rectlist = []
+        for b in bullets:
+            bullets_rectlist.append((b.rect.x, b.rect.y))
 
         # Send tank turn and position to server
-        data[current_id] = [tank.rect.x, tank.rect.y, tank.turn]
+        data[current_id] = [tank.rect.x, tank.rect.y, tank.turn, bullets_rectlist]
         n.send_data(data)
         # Receive their positions and draw it
         data = n.receive_data()
