@@ -57,7 +57,7 @@ def drawonscreen(screen, tank, data, bullets, user_name):
     pygame.display.update()
 
 
-data = {0: [], 1: [], 2: [], 3: []}
+data = dict()
 #[x, y, turn]
 def main():
     global data
