@@ -3,7 +3,7 @@ import threading
 import pickle
 
 server = "127.0.0.1"
-port = 39877
+port = 39807
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -33,7 +33,8 @@ def handle_client(conn, addr, id):
                 if client != conn:
                     client.send(data)
         except:
-            clients.remove(conn)
+            if conn in clients:
+                clients.remove(conn)
             conn.close()
             break
 
@@ -43,4 +44,6 @@ while True:
     thread = threading.Thread(target=handle_client, args=(conn, addr, id))
     thread.start()
     print(f"Active connections: {threading.active_count() - 1}")
+    print(f"Conn : {conn}")
+    print(f"Clients: {clients}")
     id += 1
