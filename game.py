@@ -13,6 +13,7 @@ screen = pygame.display.set_mode(size)
 screen_rect = screen.get_rect()
 
 tank_image = pygame.image.load("tank_images/tank_red.png").convert_alpha()
+tank_destroyed = pygame.image.load("tank_images/tank_destroyed0.png").convert_alpha()
 bullet_image = pygame.image.load("bullet.png")
 tank_image_right  = pygame.transform.rotate(tank_image, -90)
 tank_image_left = pygame.transform.rotate(tank_image, -270)
@@ -25,6 +26,7 @@ def drawonscreen(screen, tank, data, bullets):
     if data != None:
         for d in data:
                 if data[d] != []:
+                    # Atualiza cada tank com sua respectiva posicao
                     if data[d][2] in [0, 4, -4]: #Tank is poiting to the top
                         screen.blit(tank_image, (data[d][0], data[d][1]))
                     if data[d][2] in [-2, 2]: #Tank is pointing down
@@ -33,9 +35,13 @@ def drawonscreen(screen, tank, data, bullets):
                         screen.blit(tank_image_right, (data[d][0], data[d][1]))
                     if data[d][2] in [1, -3]: #Tank is poiting to the left
                         screen.blit(tank_image_left, (data[d][0], data[d][1]))
+
+                    # Se tiver bala, atualiza na tela
                     if data[d][3] != None:
                         for b in data[d][3]:
                             screen.blit(bullet_image, (b[0], b[1]))
+
+                    # Se tiver destruido, coloca uma animacao na tela
     bullets.draw(screen)
     pygame.display.update()
 
@@ -52,16 +58,17 @@ def main():
 
     run_game =  True
     n = Network()
-    current_id = n.connect("anon")
+    current_id = n.connect(input("Digite usuario: "))
     while run_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:  # Pressione espaço para atirar
-                    bullet = Bullet(bullet_image, tank)
-                    bullets.add(bullet)
+                if tank.endurance > 0:
+                    if event.key == pygame.K_SPACE:  # Pressione espaço para atirar
+                        bullet = Bullet(bullet_image, tank)
+                        bullets.add(bullet)
         keys = pygame.key.get_pressed()
         if tank.turn == 4 or tank.turn == -4:  # one cycle
             tank.turn = 0 #this needs to be sent, and considered in the clients
@@ -83,6 +90,8 @@ def main():
             bullets_rectlist.append((b.rect.x, b.rect.y))
 
         # Send tank turn and position to server
+        # {0: [], 1: [], 2: [], 3: [], 45: [9, 564, 0, []], 44: [0, 0, 0, []]}
+
         data[current_id] = [tank.rect.x, tank.rect.y, tank.turn, bullets_rectlist]
         n.send_data(data)
         # Receive their positions and draw it
@@ -102,9 +111,10 @@ def main():
         if a != -1: # A coliision happended
             tank.endurance -= 1
             print(f"Tank {current_id} endurance:  {tank.endurance}")
-            if tank.endurance == 0:
+            if tank.endurance <= 0:
                 print("TANK DESTROYED")
-                break
+                tank = Tank(image=tank_image, x=tank.rect.x, y=tank.rect.y, speed=0, endurance=0)
+
 
         print("id: ", current_id)
         print(data)
