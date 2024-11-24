@@ -4,6 +4,7 @@ from bullet import Bullet
 from client import Network
 import pickle
 
+pygame.font.init()
 
 size = width, height = 900, 700
 tank_width, tank_height = 81, 81
@@ -18,14 +19,24 @@ bullet_image = pygame.image.load("bullet.png")
 tank_image_right  = pygame.transform.rotate(tank_image, -90)
 tank_image_left = pygame.transform.rotate(tank_image, -270)
 tank_image_down =  pygame.transform.rotate(tank_image, -180)
+my_font = pygame.font.SysFont('Comic Sans MS', 30)
 
-def drawonscreen(screen, tank, data, bullets):
+
+def drawonscreen(screen, tank, data, bullets, user_name):
     screen.fill(grey)
     screen.blit(tank.image, tank.rect)
 
+
     if data != None:
         for d in data:
+
+
                 if data[d] != []:
+
+                    if data[d][4] != None:
+                        user_name_surface = my_font.render(data[d][4], False, (0, 0, 0))
+                        screen.blit(user_name_surface, (data[d][0] - 16, data[d][1] - 40))
+
                     # Atualiza cada tank com sua respectiva posicao
                     if data[d][2] in [0, 4, -4]: #Tank is poiting to the top
                         screen.blit(tank_image, (data[d][0], data[d][1]))
@@ -58,7 +69,9 @@ def main():
 
     run_game =  True
     n = Network()
-    current_id = n.connect(input("Digite usuario: "))
+    user_name = input("Digite usuario: ")
+    current_id = n.connect(user_name)
+
     while run_game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -92,7 +105,7 @@ def main():
         # Send tank turn and position to server
         # {0: [], 1: [], 2: [], 3: [], 45: [9, 564, 0, []], 44: [0, 0, 0, []]}
 
-        data[current_id] = [tank.rect.x, tank.rect.y, tank.turn, bullets_rectlist]
+        data[current_id] = [tank.rect.x, tank.rect.y, tank.turn, bullets_rectlist, user_name]
         n.send_data(data)
         # Receive their positions and draw it
         data = n.receive_data()
@@ -120,7 +133,7 @@ def main():
         print(data)
         print("\n")
         clock.tick(30)
-        drawonscreen(screen, tank, data, bullets)
+        drawonscreen(screen, tank, data, bullets, user_name)
 
         pygame.display.flip()
 
